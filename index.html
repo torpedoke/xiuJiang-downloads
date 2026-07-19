@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>锈匠 下载</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #121314; color: #e8e8e8; }
+    body { max-width: 720px; margin: 0 auto; padding: 48px 20px; }
+    a { color: #4fc3f7; }
+    .muted { color: #9a9a9a; }
+    section { border-top: 1px solid #333; padding: 20px 0; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <h1>锈匠</h1>
+  <p class="muted">铁锈战争模组助手 · 公开下载与更新元数据</p>
+  <section>
+    <h2>最新版本</h2>
+    <div><h3>稳定版</h3><p id="stable">正在读取...</p></div>
+    <div><h3>测试版</h3><p id="beta">正在读取...</p></div>
+  </section>
+  <script>
+    async function load(channel) {
+      const el = document.getElementById(channel);
+      try {
+        const res = await fetch(`api/${channel}.json`, { cache: 'no-store' });
+        if (!res.ok) throw new Error('missing');
+        const info = await res.json();
+        const meta = [
+          info.versionName || '',
+          info.versionCode != null ? `code ${info.versionCode}` : '',
+          info.publishedAt || '',
+        ].filter(Boolean).join(' · ');
+        const link = info.apkUrl ? `<br><a href="${info.apkUrl}">下载 APK</a>` : '';
+        el.innerHTML = `<strong>${info.title || info.versionName || channel}</strong><br><span class="muted">${meta}</span>${link}`;
+      } catch (_) {
+        el.textContent = '暂无版本信息（发版后更新 api/' + channel + '.json）';
+      }
+    }
+    load('stable');
+    load('beta');
+  </script>
+</body>
+</html>
